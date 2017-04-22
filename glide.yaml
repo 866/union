@@ -1,0 +1,9 @@
+package: union
+import:
+- package: github.com/astaxie/beego
+  version: ^1.8.0
+testImport:
+- package: github.com/smartystreets/goconvey
+  version: ^1.6.2
+  subpackages:
+  - convey
