@@ -5,6 +5,6 @@ $(document).ready(function () {
     socket = new WebSocket('ws://' + window.location.host + '/ws');
     // Message received on the socket
     socket.onmessage = function (event) {
-        $('#earnings').text(event.data);
+        $('#json-renderer').jsonViewer(JSON.parse(event.data), {collapsed: false, withQuotes: false});
     };
 });

@@ -46,7 +46,7 @@ func (this *WebSocketController) Get() {
 		beego.Error("Cannot setup WebSocket connection:", err)
 		return
 	}
-	beego.Info(fmt.Sprintf("Websocket connection: %#v", ws.RemoteAddr().String()))
+	beego.Info(fmt.Sprintf("Websocket connection: %s", ws.RemoteAddr().String()))
 
 	// Generating random data
 	wsdata := messages.WSData{}
@@ -67,5 +67,5 @@ func (this *WebSocketController) Get() {
 		}
 	}
 
-	beego.BeeLogger.Info("Disconnected: %#v", ws.RemoteAddr())
+	beego.BeeLogger.Info("Disconnected: %s", ws.RemoteAddr().String())
 }

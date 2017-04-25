@@ -8,18 +8,6 @@ import (
 
 // Server --> Client messages
 
-// Author represents persons information which can be send via websockets.
-type Author struct {
-	ID string `json:"name"`
-}
-
-// FillRandom fills the author object with random data.
-// The size of name is within the range [3, 8]
-// ID has 16 runes length.
-func (a * Author) FillRandom() {
-	a.ID = randStringRunes(16)
-}
-
 // Proposal represents proposal information which can be send via websockets.
 // Example of JSON representation of proposal's object:
 // var proposal = {
@@ -39,37 +27,38 @@ func (a * Author) FillRandom() {
 //	posexp: 7320, // in sec
 // }
 type Proposal struct {
-	Author Author `json:"author"`
-	ID string `json:"id"`
-	Type byte `json:"type"`
-	Price float32 `json:"price"`
-	StopLoss float32 `json:"stoploss"`
-	TakeProfit float32 `json:"takeprofit"`
-	Score float32 `json:"score"`
-	Deadline int64 `json:"deadline"`
-	PendingExp int64 `json:"pendexp"`
+	AuthorID    string `json:"authorid"`
+	ID          string `json:"id"`
+	Type        byte `json:"type"`
+	Price       float32 `json:"price"`
+	StopLoss    float32 `json:"stoploss"`
+	TakeProfit  float32 `json:"takeprofit"`
+	Score       float32 `json:"score"`
+	Deadline    int64 `json:"deadline"`
+	PendingExp  int64 `json:"pendexp"`
 	PositionExp int64 `json:"posexp"`
 }
 
 // ProposalUpdate sends the update message for the proposal with given ID
 type ProposalUpdate struct {
-	ID string `json:"id"`
+	ID    string `json:"id"`
 	Score float32 `json:"score"`
 }
 
 // ProposalUpdate sends the update message for the proposal with given ID
 type ProposalRemove struct {
-	ID string `json:"id"`
+	ID    string `json:"id"`
 	Score float32 `json:"score"`
 }
 
 // FillRandom fills the proposal object with some random data.
 // ID has 16 runes length.
+// Author
 // Type is within the range [0, 3]
 // Pending expiration is within the [900, 10000] sec range
 // Position expiration is within the [3600, 10000] sec range
 func (p *Proposal) FillRandom() {
-	p.Author.FillRandom()
+	p.AuthorID = randStringRunes(16)
 	p.ID = randStringRunes(16)
 	p.Type = byte(rand.Intn(4) % 256)
 	p.Price = rand.Float32()
@@ -77,21 +66,22 @@ func (p *Proposal) FillRandom() {
 	p.TakeProfit = rand.Float32()
 	p.Score = rand.Float32()
 	p.Deadline = rand.Int63()
-	p.PendingExp = rand.Int63n(10000-900+1) + 900
-	p.PositionExp = rand.Int63n(10000-3600+1) + 3600
+	p.PendingExp = rand.Int63n(10000 - 900 + 1) + 900
+	p.PositionExp = rand.Int63n(10000 - 3600 + 1) + 3600
 }
 
 // ChatMessage represents chat message which can be send via websockets from server to client.
 type ChatMessage struct {
-	Author Author `json:"author"`
-	Text string `json:"text"`
+	AuthorID string `json:"authorid"`
+	Text     string `json:"text"`
 }
 
 // FillRandom fills the ChatMessage object with a random data.
 // The sentence has length from 1 to 30
+// AuthorID has 16 runes length
 func (cm *ChatMessage) FillRandom() {
-	cm.Author.FillRandom()
-	n := rand.Intn(30) + 1
+	cm.AuthorID = randStringRunes(16)
+	n := rand.Intn(100) + 1
 	cm.Text = randSentence(n)
 }
 
@@ -130,8 +120,12 @@ func (wsd *WSData) FillRandom(chatsmin, chatsmax, propsmin, propsmax int) {
 	}
 	// Make data slice and fill it with randomly generated data
 	wsd.Data = make([]Message, 2)
-	wsd.Data[0] = Message{1, chats}
-	wsd.Data[1] = Message{0, props}
+	var place int
+	if rand.Float32() < .5 {
+		place = 1
+	}
+	wsd.Data[1 - place] = Message{1, chats}
+	wsd.Data[place] = Message{0, props}
 }
 
 // Converts WSData to JSON object
@@ -144,11 +138,11 @@ var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ,.
 
 // Generates the random string of size n.
 func randStringRunes(n int) string {
-    b := make([]rune, n)
-    for i := range b {
-        b[i] = letterRunes[rand.Intn(len(letterRunes))]
-    }
-    return string(b)
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	return string(b)
 }
 
 // Generates fake message of length n.

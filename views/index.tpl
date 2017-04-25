@@ -1,15 +1,23 @@
 <!DOCTYPE html>
-<script src="/static/js/jquery-1.10.1.min.js"></script>
+
 <html>
 <head>
   <title>Union Trading</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <script src="/static/js/jquery-1.10.1.min.js"></script>
+  <script src="/static/js/json-viewer/jquery.json-viewer.js"></script>
+  <link href="/static/js/json-viewer/jquery.json-viewer.css" type="text/css" rel="stylesheet" />
   <link rel="shortcut icon" href="/static/img/bee.png" type="image/x-icon" />
 
   <style type="text/css">
     *,body {
       margin: 0px;
       padding: 0px;
+    }
+
+    pre#json-renderer {
+        border: 1px solid #aaa;
+        padding: 0.5em 1.5em;
     }
 
     body {
@@ -46,7 +54,7 @@
 
     footer {
       line-height: 1.8;
-      text-align: center;
+      text-align: left;
       padding: 50px 0;
       color: #999;
     }
@@ -83,7 +91,7 @@
   <script src="/static/js/websocket.js"></script>
   <footer>
     <div class="author">
-      Earnings:<p id="earnings" class="info">0 $</p>
+      JSON  <pre id="json-renderer"></pre>
       Official website:
       <a href="http://{{.Website}}">{{.Website}}</a> /
       Contact me:
