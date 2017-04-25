@@ -24,10 +24,19 @@ func (c *MainController) Get() {
 	c.TplName = "index.tpl"
 }
 
-// Connect method handles WebSocket requests for WebSocketController.
+// Get method handles WebSocket requests for WebSocketController.
 func (this *WebSocketController) Get() {
+	// Make the websocket upgrader with compression
+	u := websocket.Upgrader{ReadBufferSize: 1024, WriteBufferSize: 1024, EnableCompression: true}
+	u.Error = func(w http.ResponseWriter, r *http.Request, status int, reason error) {
+		// don't return errors to maintain backwards compatibility
+	}
+	u.CheckOrigin = func(r *http.Request) bool {
+		// allow all connections by default
+		return true
+	}
 	// Upgrade from http request to WebSocket.
-	ws, err := websocket.Upgrade(this.Ctx.ResponseWriter, this.Ctx.Request, nil, 1024, 1024)
+	ws, err := u.Upgrade(this.Ctx.ResponseWriter, this.Ctx.Request, nil)
 	if _, ok := err.(websocket.HandshakeError); ok {
 		http.Error(this.Ctx.ResponseWriter, "Not a websocket handshake", 400)
 		return
