@@ -81,6 +81,7 @@
   <script src="/static/js/websocket.js"></script>
   <footer>
     <div class="author">
+      <button id="wsbutton" onclick="wsSwitch()">Stop/Start updating</button>
       JSON  <pre id="json-renderer"></pre>
       Official website:
       <a href="http://{{.Website}}">{{.Website}}</a> /
