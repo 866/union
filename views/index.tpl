@@ -68,16 +68,6 @@
       color: #444;
       text-decoration: none;
     }
-
-    .backdrop {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      box-shadow: inset 0px 0px 100px #ddd;
-      z-index: -1;
-      top: 0px;
-      left: 0px;
-    }
   </style>
 </head>
 
@@ -98,6 +88,5 @@
       <a class="email" href="mailto:{{.Email}}">{{.Email}}</a>
     </div>
   </footer>
-  <div class="backdrop"></div>
 </body>
 </html>
