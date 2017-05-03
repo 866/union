@@ -52,6 +52,13 @@ type ProposalRemove struct {
 	Score float32 `json:"score"`
 }
 
+// DynProp represents dynamic proposal object.
+type DynProp struct {
+	ID    string   `json:"id"`
+	Score float64  `json:"score"`
+	Votes []string `json:"votes"`
+}
+
 // FillRandom fills the proposal object with some random data.
 // ID has 16 runes length.
 // Author
