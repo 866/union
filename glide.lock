@@ -1,8 +1,8 @@
 hash: b76f6b6cb89a553592a0cb305954120b5f3ebd014aecd0e68474a8b196a2a014
-updated: 2017-04-25T22:43:50.918904799+03:00
+updated: 2017-05-03T17:57:06.594911579+03:00
 imports:
 - name: github.com/astaxie/beego
-  version: 522b3a4a70bd86c20e5d2f4ca6320b44204c0019
+  version: 7452151beec2f43c42122fd91b7523bcbccf05be
   subpackages:
   - config
   - context
@@ -11,11 +11,18 @@ imports:
   - session
   - toolbox
   - utils
+- name: github.com/bmatsuo/lmdb-go
+  version: a14b5a390eff52e52a20eceb3020038b3d291432
+  subpackages:
+  - internal/lmdbarch
+  - lmdb
 - name: github.com/gorilla/websocket
   version: a91eba7f97777409bc2c443f5534d41dd20c5720
+- name: github.com/satori/go.uuid
+  version: 879c5887cd475cd7864858769793b2ceb0d44feb
 testImports:
 - name: github.com/gopherjs/gopherjs
-  version: 265040a1352e0bb611e87f5b985bf83600c66cce
+  version: 9659c814f1d54d63f9c623449a7111d3864c1361
   subpackages:
   - js
 - name: github.com/jtolds/gls
