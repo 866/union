@@ -8,20 +8,20 @@ import (
 // Modifier is a functor interface that changes the content.
 // It is used by Modify function of DBHandler
 type Modifier interface {
-	Apply(input []byte) ([]byte, error)
+	Apply([]byte) ([]byte, error)
 }
 
 // lmdbop is a basic lmdb operation
 type lmdbop struct {
 	op  lmdb.TxnOp
-	res chan<- error
+	res chan <- error
 }
 
 // LMDB is a thread-safe wrapper over lmdb environment.
 type LMDB struct {
-	env lmdb.Env
+	env    *lmdb.Env
 	db     lmdb.DBI
-	worker chan lmdbop
+	worker chan *lmdbop
 	update func(lmdb.TxnOp) error
 }
 
@@ -82,13 +82,14 @@ func (dbh *LMDB) Modify(key []byte, m Modifier) error {
 
 // Close finishes the work with an environment. Should be called when the work is finished.
 func (dbh *LMDB) Close() {
+	close(dbh.worker)
 	dbh.env.Close()
 }
 
 // MakeLMDBHandler returns LMDB object with opened database db at the specified path.
 // If the db doesn't exit, the function creates it.
 func MakeLMDBHandler(path, db string) (l *LMDB, err error) {
-	var env lmdb.Env
+	var env *lmdb.Env
 	// Open the environment
 	env, err = lmdb.NewEnv()
 	if err != nil {
@@ -128,6 +129,7 @@ func MakeLMDBHandler(path, db string) (l *LMDB, err error) {
 		return <-res
 	}
 	// Create the lmdb object
-	l = &LMDB{env, dbi, make(chan lmdbop), update}
+	l = &LMDB{env, dbi, make(chan *lmdbop), update}
+	go l.writer()
 	return
 }
