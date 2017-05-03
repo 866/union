@@ -1,6 +1,9 @@
 package db
 
-import "testing"
+import (
+	"testing"
+	"strconv"
+)
 
 func TestLMDB(t *testing.T) {
 	lmdb, err := MakeLMDBHandler("/tmp", "lmdbtest")
@@ -54,6 +57,21 @@ func TestUpdate(t *testing.T) {
 	}
 	compareBytes(read, expected, t)
 	lmdb.Close()
+}
+
+func BenchmarkWrite100bytesEntries(b *testing.B) {
+	message := make([]byte, 100)
+	for i := range message {
+		message[i] = byte(i)
+	}
+	lmdb, err := MakeLMDBHandler("/tmp", "lmdbtest")
+	if err != nil {
+		b.Errorf("MakeLMDBHandler error: %v", err)
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = lmdb.Write([]byte(strconv.Itoa(i)), message)
+	}
 }
 
 func compareBytes(a, b []byte, t *testing.T) {
