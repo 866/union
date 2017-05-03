@@ -12,7 +12,6 @@ import (
 // ProposalController handles Proposal requests.
 type ProposalController struct {
 	beego.Controller
-	DB db.DBHandler
 }
 
 // Get method handles Proposal requests for ProposalController.
@@ -28,7 +27,7 @@ func (this *ProposalController) Get() {
 		return
 	}
 	var data []byte
-	data, err = this.DB.Read(id.Bytes())
+	data, err = db.DB.Read(id.Bytes())
 	if err != nil {
 		messages.SendError(this.Ctx.WriteString, err)
 		return

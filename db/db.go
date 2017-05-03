@@ -8,3 +8,6 @@ type DBHandler interface {
 	Modify([]byte, Modifier) error
 	Close()
 }
+
+// DB is a global variable for handling the database
+var DB DBHandler
