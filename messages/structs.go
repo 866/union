@@ -4,6 +4,7 @@ package messages
 import (
 	"math/rand"
 	"encoding/json"
+	"github.com/satori/go.uuid"
 )
 
 // Server --> Client messages
@@ -59,7 +60,7 @@ type ProposalRemove struct {
 // Position expiration is within the [3600, 10000] sec range
 func (p *Proposal) FillRandom() {
 	p.AuthorID = randStringRunes(16)
-	p.ID = randStringRunes(16)
+	p.ID = string(uuid.NewV4().Bytes())
 	p.Type = byte(rand.Intn(4) % 256)
 	p.Price = rand.Float32()
 	p.StopLoss = rand.Float32()
