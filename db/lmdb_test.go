@@ -3,6 +3,7 @@ package db
 import (
 	"testing"
 	"strconv"
+	"math/rand"
 )
 
 func TestLMDB(t *testing.T) {
@@ -24,10 +25,12 @@ func TestLMDB(t *testing.T) {
 	lmdb.Close()
 }
 
-type Update struct{
+// Update is a fake Modifier interface for testing.
+type Update struct {
 	Expected []byte
 }
 
+// Apply is a faked Modifier method for testing. It changes the data to Expected
 func (u Update) Apply(input []byte) ([]byte, error) {
 	return u.Expected, nil
 }
@@ -73,6 +76,25 @@ func BenchmarkWrite100bytesEntries(b *testing.B) {
 		_ = lmdb.Write([]byte(strconv.Itoa(i)), message)
 	}
 }
+
+func BenchmarkRead100bytesEntries(b *testing.B) {
+	message := make([]byte, 100)
+	for i := range message {
+		message[i] = byte(i)
+	}
+	lmdb, err := MakeLMDBHandler("/tmp", "lmdbtest")
+	if err != nil {
+		b.Errorf("MakeLMDBHandler error: %v", err)
+	}
+	for i := 0; i < 50; i++ {
+		_ = lmdb.Write([]byte{byte(i)}, message)
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = lmdb.Read([]byte{byte(rand.Intn(50))})
+	}
+}
+
 
 func compareBytes(a, b []byte, t *testing.T) {
 	if len(a) != len(b) {
