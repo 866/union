@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"encoding/json"
 	"github.com/satori/go.uuid"
+	"fmt"
 )
 
 // Server --> Client messages
@@ -139,6 +140,12 @@ func (wsd *WSData) FillRandom(chatsmin, chatsmax, propsmin, propsmax int) {
 // Converts WSData to JSON object
 func (wsd *WSData) Jsonify() ([]byte, error) {
 	return json.Marshal(wsd)
+}
+
+// SendError wraps error message into json format.
+func SendError(sender func(content string), err error) {
+	str := fmt.Sprintf("{\"err\":\"%s\"}", err.Error())
+	sender(str)
 }
 
 // Possible runes are listed here.
