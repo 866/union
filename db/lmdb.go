@@ -96,7 +96,7 @@ func MakeLMDBHandler(path, db string) (l *LMDB, err error) {
 		return
 	}
 	// Set max db size
-	err = env.SetMapSize(1024 * 1024 * 1024) // 1GB
+	err = env.SetMapSize(100 * 1024 * 1024) // 100MB
 	if err != nil {
 		return
 	}
