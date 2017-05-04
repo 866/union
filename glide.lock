@@ -1,5 +1,5 @@
 hash: b76f6b6cb89a553592a0cb305954120b5f3ebd014aecd0e68474a8b196a2a014
-updated: 2017-05-03T17:57:06.594911579+03:00
+updated: 2017-05-04T23:02:11.185735063+03:00
 imports:
 - name: github.com/astaxie/beego
   version: 7452151beec2f43c42122fd91b7523bcbccf05be
@@ -18,6 +18,8 @@ imports:
   - lmdb
 - name: github.com/gorilla/websocket
   version: a91eba7f97777409bc2c443f5534d41dd20c5720
+- name: github.com/pkg/errors
+  version: ff09b135c25aae272398c51a07235b90a75aa4f0
 - name: github.com/satori/go.uuid
   version: 879c5887cd475cd7864858769793b2ceb0d44feb
 testImports:
