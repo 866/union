@@ -67,8 +67,8 @@ type DynProp struct {
 // Pending expiration is within the [900, 10000] sec range
 // Position expiration is within the [3600, 10000] sec range
 func (p *Proposal) FillRandom() {
-	p.AuthorID = randStringRunes(16)
-	p.ID = string(uuid.NewV4().Bytes())
+	p.AuthorID = uuid.NewV4().String()
+	p.ID = uuid.NewV4().String()
 	p.Type = byte(rand.Intn(4) % 256)
 	p.Price = rand.Float32()
 	p.StopLoss = rand.Float32()
@@ -89,7 +89,7 @@ type ChatMessage struct {
 // The sentence has length from 1 to 30
 // AuthorID has 16 runes length
 func (cm *ChatMessage) FillRandom() {
-	cm.AuthorID = randStringRunes(16)
+	cm.AuthorID = uuid.NewV4().String()
 	n := rand.Intn(100) + 1
 	cm.Text = randSentence(n)
 }
