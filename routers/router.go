@@ -18,7 +18,7 @@ func initLMDB() {
 	}
 	id := uuid.NewV4()
 	fmt.Println("Prop ID: ", id.String())
-	prop := messages.ChatMessage{}
+	prop := messages.Proposal{}
 	prop.FillRandom()
 	data, _ := json.Marshal(prop)
 	lmdb.Write(id.Bytes(), data)
