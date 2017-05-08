@@ -98,7 +98,7 @@ func (cm *ChatMessage) FillRandom() {
 // Previous containts the id of previous bucket.
 // Data contains chat messages.
 type ChatBucket struct {
-	Previous *string `json:"previous"`
+	Previous *string `json:"previous,omitempty"`
 	Data []ChatMessage `json:"data"`
 }
 

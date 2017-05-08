@@ -25,11 +25,20 @@ func initLMDB() {
 	lmdb.Write(db.PROPOSALS, id.Bytes(), data)
 	// Add random chat message to the database
 	id = uuid.NewV4()
-	beego.Info("Chat Message ID: ", id.String())
-	chat := messages.ChatMessage{}
-	chat.FillRandom()
-	data, _ = json.Marshal(chat)
+
+	chatb := messages.ChatBucket{}
+	chatb.FillRandom(15)
+	data, _ = json.Marshal(chatb)
 	lmdb.Write(db.CHAT, id.Bytes(), data)
+
+	prev := id.String()
+	id = uuid.NewV4()
+	chatb.FillRandom(20)
+	chatb.Previous = &prev
+	data, _ = json.Marshal(chatb)
+	lmdb.Write(db.CHAT, id.Bytes(), data)
+
+	beego.Info("Chat Message ID: ", id.String())
 	// Global database
 	db.DB = lmdb
 }
