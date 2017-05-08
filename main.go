@@ -12,7 +12,7 @@ import (
 
 // initialize lmdb database
 func initLMDB() {
-	lmdb, err := db.MakeLMDBHandler("/tmp", "mydb")
+	lmdb, err := db.MakeLMDBHandler("./", "mydb")
 	if err != nil {
 		panic(err)
 	}

@@ -9,5 +9,14 @@ type DBHandler interface {
 	Close()
 }
 
-// DB is a global variable for handling the database
-var DB DBHandler
+
+var (
+	// DB is a global variable for handling the database
+	DB DBHandler
+	// LastCB is a key pointer to last chat bucket ID.
+	LastCB []byte
+)
+
+func init() {
+	LastCB = []byte{0}
+}
