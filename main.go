@@ -38,7 +38,7 @@ func initLMDB() {
 	data, _ = json.Marshal(chatb)
 	lmdb.Write(db.CHAT, id.Bytes(), data)
 
-	beego.Info("Chat Message ID: ", id.String())
+	beego.Info("Chat Bucket ID: ", id.String())
 	// Global database
 	db.DB = lmdb
 }
