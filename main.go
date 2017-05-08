@@ -12,7 +12,7 @@ import (
 
 // initialize lmdb database
 func initLMDB() {
-	lmdb, err := db.MakeLMDBHandler("./", "mydb")
+	lmdb, err := db.MakeLMDBHandler("./")
 	if err != nil {
 		panic(err)
 	}
@@ -22,14 +22,14 @@ func initLMDB() {
 	prop := messages.Proposal{}
 	prop.FillRandom()
 	data, _ := json.Marshal(prop)
-	lmdb.Write(id.Bytes(), data)
+	lmdb.Write(db.PROPOSALS, id.Bytes(), data)
 	// Add random chat message to the database
 	id = uuid.NewV4()
 	beego.Info("Chat Message ID: ", id.String())
 	chat := messages.ChatMessage{}
 	chat.FillRandom()
 	data, _ = json.Marshal(chat)
-	lmdb.Write(id.Bytes(), data)
+	lmdb.Write(db.CHAT, id.Bytes(), data)
 	// Global database
 	db.DB = lmdb
 }

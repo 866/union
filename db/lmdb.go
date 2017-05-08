@@ -20,7 +20,7 @@ type lmdbop struct {
 // LMDB is a thread-safe wrapper over lmdb environment.
 type LMDB struct {
 	env    *lmdb.Env
-	db     lmdb.DBI
+	dbs    map[string]lmdb.DBI
 	worker chan *lmdbop
 	update func(lmdb.TxnOp) error
 }
@@ -43,17 +43,17 @@ func (dbh *LMDB) writer() {
 
 // Write writes the content val at address key.
 // If DBHandler is not initialized the function panics.
-func (dbh *LMDB) Write(key, val []byte) error {
+func (dbh *LMDB) Write(db string, key, val []byte) error {
 	return dbh.update(func(txn *lmdb.Txn) (err error) {
-		return txn.Put(dbh.db, key, val, 0)
+		return txn.Put(dbh.dbs[db], key, val, 0)
 	})
 }
 
 // Read reads the value at address key.
 // If DBHandler is not initialized the function panics.
-func (dbh *LMDB) Read(key []byte) (v []byte, err error) {
+func (dbh *LMDB) Read(db string, key []byte) (v []byte, err error) {
 	err = dbh.env.View(func(txn *lmdb.Txn) (err error) {
-		v, err = txn.Get(dbh.db, key)
+		v, err = txn.Get(dbh.dbs[db], key)
 		return err
 	})
 	return
@@ -61,11 +61,11 @@ func (dbh *LMDB) Read(key []byte) (v []byte, err error) {
 
 // Modify extracts content which corresponds to the key then it modifies it by means of functor m.
 // If DBHandler is not initialized the function panics.
-func (dbh *LMDB) Modify(key []byte, m Modifier) error {
+func (dbh *LMDB) Modify(db string, key []byte, m Modifier) error {
 	return dbh.update(func(txn *lmdb.Txn) (err error) {
 		var v []byte
 		// Read
-		v, err = txn.Get(dbh.db, key)
+		v, err = txn.Get(dbh.dbs[db], key)
 		if err != nil {
 			return
 		}
@@ -75,7 +75,7 @@ func (dbh *LMDB) Modify(key []byte, m Modifier) error {
 			return
 		}
 		// Write the update
-		err = txn.Put(dbh.db, key, v, 0)
+		err = txn.Put(dbh.dbs[db], key, v, 0)
 		return
 	})
 }
@@ -88,7 +88,7 @@ func (dbh *LMDB) Close() {
 
 // MakeLMDBHandler returns LMDB object with opened database db at the specified path.
 // If the db doesn't exit, the function creates it.
-func MakeLMDBHandler(path, db string) (l *LMDB, err error) {
+func MakeLMDBHandler(path string) (l *LMDB, err error) {
 	var env *lmdb.Env
 	// Open the environment
 	env, err = lmdb.NewEnv()
@@ -101,7 +101,7 @@ func MakeLMDBHandler(path, db string) (l *LMDB, err error) {
 		return
 	}
 	// Change this value if you want to have more dbs
-	err = env.SetMaxDBs(1)
+	err = env.SetMaxDBs(10)
 	if err != nil {
 		return
 	}
@@ -110,12 +110,17 @@ func MakeLMDBHandler(path, db string) (l *LMDB, err error) {
 	if err != nil {
 		return
 	}
-	// Open or create the database
-	var dbi lmdb.DBI
+	// Open or create the databases
+	dbs := make(map[string]lmdb.DBI)
 	err = env.Update(func(txn *lmdb.Txn) (err error) {
-		dbi, err = txn.OpenDBI(db, 0)
-		if err != nil {
-			dbi, err = txn.OpenDBI(db, lmdb.Create)
+		for _, db := range DBList {
+			dbs[db], err = txn.OpenDBI(db, 0)
+			if err != nil {
+				dbs[db], err = txn.OpenDBI(db, lmdb.Create)
+				if err != nil {
+					return
+				}
+			}
 		}
 		return
 	})
@@ -129,7 +134,7 @@ func MakeLMDBHandler(path, db string) (l *LMDB, err error) {
 		return <-res
 	}
 	// Create the lmdb object
-	l = &LMDB{env, dbi, make(chan *lmdbop), update}
+	l = &LMDB{env, dbs, make(chan *lmdbop), update}
 	go l.writer()
 	return
 }

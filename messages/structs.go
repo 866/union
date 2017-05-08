@@ -96,7 +96,7 @@ func (cm *ChatMessage) FillRandom() {
 
 // ChatBucket is a bucket of messages.
 // Previous containts the id of previous bucket.
-// Data contains chat messages
+// Data contains chat messages.
 type ChatBucket struct {
 	Previous *string `json:"previous"`
 	Data []ChatMessage `json:"data"`
@@ -152,7 +152,7 @@ func (wsd *WSData) FillRandom(chatsmin, chatsmax, propsmin, propsmax int) {
 	wsd.Data[place] = Message{0, props}
 }
 
-// Converts WSData to JSON object
+// Jsonify converts WSData to JSON object.
 func (wsd *WSData) Jsonify() ([]byte, error) {
 	return json.Marshal(wsd)
 }

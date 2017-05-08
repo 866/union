@@ -27,7 +27,7 @@ func (this *ProposalController) Get() {
 		return
 	}
 	var data []byte
-	data, err = db.DB.Read(id.Bytes())
+	data, err = db.DB.Read(db.PROPOSALS, id.Bytes())
 	if err != nil {
 		messages.SendError(this.Ctx.WriteString, err)
 		return

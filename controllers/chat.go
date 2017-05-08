@@ -22,7 +22,7 @@ func (this *ChatController) Get() {
 	}
 	// Read the underlying data
 	var data []byte
-	data, err = db.DB.Read(idbytes)
+	data, err = db.DB.Read(db.CHAT, idbytes)
 	if err != nil {
 		messages.SendError(this.Ctx.WriteString, err)
 		return
@@ -35,7 +35,7 @@ func (this *ChatController) Get() {
 // If idstr is empty it fetches the last bucket
 func chatUUIDstring(idstr string) (idbytes []byte, err error) {
 	if idstr == "" {
-		idbytes, err = db.DB.Read(db.LastCB)
+		idbytes, err = db.DB.Read(db.CHAT, db.LastCB)
 	} else {
 		var id uuid.UUID
 		id, err = uuid.FromString(idstr)
