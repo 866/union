@@ -94,6 +94,22 @@ func (cm *ChatMessage) FillRandom() {
 	cm.Text = randSentence(n)
 }
 
+// ChatBucket is a bucket of messages.
+// Previous containts the id of previous bucket.
+// Data contains chat messages
+type ChatBucket struct {
+	Previous *string `json:"previous"`
+	Data []ChatMessage `json:"data"`
+}
+
+// FillRandom fills chat bucket with n random messages.
+func (cb *ChatBucket) FillRandom(n int) {
+	cb.Data = make([]ChatMessage, n)
+	for i := range cb.Data {
+		cb.Data[i].FillRandom()
+	}
+}
+
 // Message is a single websocket message
 // Type value can be:
 //	0 - all proposals
@@ -104,14 +120,6 @@ func (cm *ChatMessage) FillRandom() {
 type Message struct {
 	Type byte `json:"type"`
 	Data interface{} `json:"data"`
-}
-
-// ChatBucket is a bucket of messages.
-// Previous containts the id of previous bucket.
-// Data contains chat messages
-type ChatBucket struct {
-	Previous *string `json:"previous"`
-	Data []ChatMessage `json:"data"`
 }
 
 // WSData stores multiple Messages. Can be Marshalled to json
