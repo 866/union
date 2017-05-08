@@ -7,17 +7,17 @@ import (
 )
 
 func TestLMDB(t *testing.T) {
-	lmdb, err := MakeLMDBHandler("/tmp", "lmdbtest")
+	lmdb, err := MakeLMDBHandler("/tmp")
 	written := []byte("123")
 	if err != nil {
 		t.Errorf("MakeLMDBHandler error: %v", err)
 	}
-	err = lmdb.Write([]byte("val"), written)
+	err = lmdb.Write(PROPOSALS, []byte("val"), written)
 	if err != nil {
 		t.Errorf("lmdb.Write error: %v", err)
 	}
 	var read []byte
-	read, err = lmdb.Read([]byte("val"))
+	read, err = lmdb.Read(PROPOSALS, []byte("val"))
 	if err != nil {
 		t.Errorf("lmdb.Write error: %v", err)
 	}
@@ -36,25 +36,25 @@ func (u Update) Apply(input []byte) ([]byte, error) {
 }
 
 func TestUpdate(t *testing.T) {
-	lmdb, err := MakeLMDBHandler("/tmp", "lmdbtest")
+	lmdb, err := MakeLMDBHandler("/tmp")
 	written := []byte("1")
 	expected := []byte("202323")
 	if err != nil {
 		t.Errorf("MakeLMDBHandler error: %v", err)
 	}
 	// Write the data
-	err = lmdb.Write([]byte("key"), written)
+	err = lmdb.Write(PROPOSALS, []byte("key"), written)
 	if err != nil {
 		t.Errorf("lmdb.Write error: %v", err)
 	}
 
 	// Update the value
 	u := Update{expected}
-	lmdb.Modify([]byte("key"), u)
+	lmdb.Modify(PROPOSALS, []byte("key"), u)
 
 	// Check the result
 	var read []byte
-	read, err = lmdb.Read([]byte("key"))
+	read, err = lmdb.Read(PROPOSALS, []byte("key"))
 	if err != nil {
 		t.Errorf("lmdb.Write error: %v", err)
 	}
@@ -67,13 +67,13 @@ func BenchmarkWrite100bytesEntries(b *testing.B) {
 	for i := range message {
 		message[i] = byte(i)
 	}
-	lmdb, err := MakeLMDBHandler("/tmp", "lmdbtest")
+	lmdb, err := MakeLMDBHandler("/tmp")
 	if err != nil {
 		b.Errorf("MakeLMDBHandler error: %v", err)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = lmdb.Write([]byte(strconv.Itoa(i)), message)
+		_ = lmdb.Write(PROPOSALS, []byte(strconv.Itoa(i)), message)
 	}
 }
 
@@ -82,16 +82,16 @@ func BenchmarkRead100bytesEntries(b *testing.B) {
 	for i := range message {
 		message[i] = byte(i)
 	}
-	lmdb, err := MakeLMDBHandler("/tmp", "lmdbtest")
+	lmdb, err := MakeLMDBHandler("/tmp")
 	if err != nil {
 		b.Errorf("MakeLMDBHandler error: %v", err)
 	}
 	for i := 0; i < 50; i++ {
-		_ = lmdb.Write([]byte{byte(i)}, message)
+		_ = lmdb.Write(PROPOSALS, []byte{byte(i)}, message)
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = lmdb.Read([]byte{byte(rand.Intn(50))})
+		_, _ = lmdb.Read(PROPOSALS, []byte{byte(rand.Intn(50))})
 	}
 }
 
