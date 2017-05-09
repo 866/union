@@ -4,6 +4,7 @@ import (
 	"testing"
 	"strconv"
 	"math/rand"
+	"sync"
 )
 
 func TestLMDB(t *testing.T) {
@@ -77,6 +78,41 @@ func BenchmarkWrite100bytesEntries(b *testing.B) {
 	}
 }
 
+func BenchmarkWrite10kbytesEntries(b *testing.B) {
+	message := make([]byte, 10 * 1024)
+	for i := range message {
+		message[i] = byte(i % 256)
+	}
+	lmdb, err := MakeLMDBHandler("/tmp")
+	if err != nil {
+		b.Errorf("MakeLMDBHandler error: %v", err)
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = lmdb.Write(PROPOSALS, []byte(strconv.Itoa(i)), message)
+	}
+}
+
+
+func BenchmarkRead10kbytesEntries(b *testing.B) {
+	message := make([]byte, 10 * 1024)
+	for i := range message {
+		message[i] = byte(i % 256)
+	}
+	lmdb, err := MakeLMDBHandler("/tmp")
+	if err != nil {
+		b.Errorf("MakeLMDBHandler error: %v", err)
+	}
+	for i := 0; i < 50; i++ {
+		_ = lmdb.Write(PROPOSALS, []byte{byte(i)}, message)
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = lmdb.Read(PROPOSALS, []byte{byte(rand.Intn(50))})
+	}
+}
+
+
 func BenchmarkRead100bytesEntries(b *testing.B) {
 	message := make([]byte, 100)
 	for i := range message {
@@ -93,6 +129,30 @@ func BenchmarkRead100bytesEntries(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_, _ = lmdb.Read(PROPOSALS, []byte{byte(rand.Intn(50))})
 	}
+}
+
+func BenchmarkRead10kbytesEntriesWithParallelReaders(b *testing.B) {
+	message := make([]byte, 10 * 1024)
+	for i := range message {
+		message[i] = byte(i % 256)
+	}
+	lmdb, err := MakeLMDBHandler("/tmp")
+	if err != nil {
+		b.Errorf("MakeLMDBHandler error: %v", err)
+	}
+	for i := 0; i < 50; i++ {
+		_ = lmdb.Write(PROPOSALS, []byte{byte(i)}, message)
+	}
+	b.ResetTimer()
+	wg := sync.WaitGroup{}
+	for i := 0; i < b.N; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			lmdb.Read(PROPOSALS, []byte{byte(rand.Intn(50))})
+		}()
+	}
+	wg.Wait()
 }
 
 
