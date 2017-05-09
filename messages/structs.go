@@ -47,8 +47,8 @@ type Proposal struct {
 	History     []Event `json:"history"`
 	// Dynamic components
 	// Votes and involved appear right after the proposal has been triggered
-	Votes []string `json:"votes,omitempty"`
-	Involved []string `json:"involved,omitempty"`
+	Votes       []string `json:"votes,omitempty"`
+	Involved    []string `json:"involved,omitempty"`
 }
 
 // ProposalUpdate sends the update message for the proposal with given ID
@@ -62,7 +62,6 @@ type DynProp struct {
 	ID    string   `json:"id"` // Reference to the static proposal
 	Score float64  `json:"score"`
 	Votes []string `json:"votes"`
-	Involved []string `json:"involved"`
 }
 
 // FillRandom fills the proposal object with some random data.
@@ -71,6 +70,7 @@ type DynProp struct {
 // Type is within the range [0, 3]
 // Pending expiration is within the [900, 10000] sec range
 // Position expiration is within the [3600, 10000] sec range
+// History length is within the [1,4] range
 func (p *Proposal) FillRandom() {
 	p.AuthorID = uuid.NewV4().String()
 	p.ID = uuid.NewV4().String()
@@ -82,7 +82,7 @@ func (p *Proposal) FillRandom() {
 	p.Deadline = rand.Int63()
 	p.PendingExp = rand.Int63n(10000 - 900 + 1) + 900
 	p.PositionExp = rand.Int63n(10000 - 3600 + 1) + 3600
-	history := make([]Event, 4)
+	history := make([]Event, rand.Intn(4)+1)
 	for i := range history {
 		history[i].FillRandom()
 	}
