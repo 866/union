@@ -20,7 +20,9 @@ import (
 //		rate: 2.72
 //	}
 //	type: 1, // 0 - buystop(buy before), 1 - buylimit(buy after), 2 - sellstop(sell after), 3 - selllimit(sell before)
+// 	state: 0, // 0 - proposal, 1 - pending order, 2 - position, 3 - expired proposal, 4 - expired pending order, 5 - expired position
 //	price: 1.2345,
+//      goalscore: 10.24,
 //	stoploss: 1.2327, // price - 0.0020 + spread(0.0002)
 //	takeprofit: 1.2397, // price + 0.0050 + spread(0.0002)
 //	score: 2.72,
@@ -29,16 +31,24 @@ import (
 //	posexp: 7320, // in sec
 // }
 type Proposal struct {
+	// Static components
 	AuthorID    string `json:"authorid"`
 	ID          string `json:"id"`
 	Type        byte `json:"type"`
+	State       byte `json:"state"`
 	Price       float32 `json:"price"`
 	StopLoss    float32 `json:"stoploss"`
 	TakeProfit  float32 `json:"takeprofit"`
 	Score       float32 `json:"score"`
+	GoalScore   float32 `json:"goalscore"`
 	Deadline    int64 `json:"deadline"`
 	PendingExp  int64 `json:"pendexp"`
 	PositionExp int64 `json:"posexp"`
+	History     []Event `json:"history"`
+	// Dynamic components
+	// Votes and involved appear right after the proposal has been triggered
+	Votes []string `json:"votes,omitempty"`
+	Involved []string `json:"involved,omitempty"`
 }
 
 // ProposalUpdate sends the update message for the proposal with given ID
@@ -47,17 +57,12 @@ type ProposalUpdate struct {
 	Score float32 `json:"score"`
 }
 
-// ProposalUpdate sends the update message for the proposal with given ID
-type ProposalRemove struct {
-	ID    string `json:"id"`
-	Score float32 `json:"score"`
-}
-
 // DynProp represents dynamic proposal object.
 type DynProp struct {
-	ID    string   `json:"id"`
+	ID    string   `json:"id"` // Reference to the static proposal
 	Score float64  `json:"score"`
 	Votes []string `json:"votes"`
+	Involved []string `json:"involved"`
 }
 
 // FillRandom fills the proposal object with some random data.
@@ -77,6 +82,11 @@ func (p *Proposal) FillRandom() {
 	p.Deadline = rand.Int63()
 	p.PendingExp = rand.Int63n(10000 - 900 + 1) + 900
 	p.PositionExp = rand.Int63n(10000 - 3600 + 1) + 3600
+	history := make([]Event, 4)
+	for i := range history {
+		history[i].FillRandom()
+	}
+	p.History = history
 }
 
 // ChatMessage represents chat message which can be send via websockets from server to client.
