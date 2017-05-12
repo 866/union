@@ -1,8 +1,9 @@
 package db
 
 import (
-	"github.com/bmatsuo/lmdb-go/lmdb"
 	"runtime"
+
+	"github.com/bmatsuo/lmdb-go/lmdb"
 )
 
 // Modifier is a functor interface that changes the content.
@@ -14,7 +15,7 @@ type Modifier interface {
 // lmdbop is a basic lmdb operation
 type lmdbop struct {
 	op  lmdb.TxnOp
-	res chan <- error
+	res chan<- error
 }
 
 // LMDB is a thread-safe wrapper over lmdb environment.
