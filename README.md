@@ -2,7 +2,7 @@
 
 This is a web server written in Go for communication with clients and with
 **Trigger** server. **Trigger** server is not for public use so it is on the
-private repository. If you want to collaborate please contact me <comrazvictor@example.com>
+private repository. If you want to collaborate please contact me <comrazvictor@gmail.com>
 
 ### What is this server for? ###
 
