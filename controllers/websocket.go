@@ -1,13 +1,19 @@
+// websocket.go introduces websocket handling functionality
+// 866
+// All Rights Reserved
+
 package controllers
 
 import (
-	"github.com/gorilla/websocket"
-	"github.com/astaxie/beego"
+	"fmt"
+	"math/rand"
 	"net/http"
 	"time"
-	"math/rand"
-	"fmt"
+
 	"union/messages"
+
+	"github.com/astaxie/beego"
+	"github.com/gorilla/websocket"
 )
 
 type MainController struct {
@@ -58,7 +64,7 @@ func (this *WebSocketController) Get() {
 	}
 	// Send messages until everything ok.
 	for ws.WriteMessage(websocket.TextMessage, send) == nil {
-		time.Sleep(time.Millisecond * time.Duration(rand.Intn(3000) + 900))
+		time.Sleep(time.Millisecond * time.Duration(rand.Intn(3000)+900))
 		wsdata.FillRandom(0, 40, 0, 15)
 		send, err = wsdata.Jsonify()
 		if err != nil {
@@ -66,6 +72,5 @@ func (this *WebSocketController) Get() {
 			return
 		}
 	}
-
 	beego.BeeLogger.Info("Disconnected: %s", ws.RemoteAddr().String())
 }

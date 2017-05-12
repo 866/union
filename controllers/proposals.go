@@ -1,12 +1,17 @@
+// proposals.go introduces proposal functionality
+// 866
+// All Rights Reserved
+
+// Package controllers contains general handlers of the web server.
 package controllers
 
 import (
-	"github.com/astaxie/beego"
-	"github.com/satori/go.uuid"
-
 	"union/db"
 	"union/messages"
+
+	"github.com/astaxie/beego"
 	"github.com/pkg/errors"
+	"github.com/satori/go.uuid"
 )
 
 // ProposalController handles Proposal requests.

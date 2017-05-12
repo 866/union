@@ -4,3 +4,7 @@
 
 package messages
 
+// TCPEngine is a gameplay engine that works with TCP trigger server.
+type TCPEngine struct {
+
+}
