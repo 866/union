@@ -48,7 +48,6 @@ func main() {
 	// init the database
 	initLMDB()
 	beego.Info("DB is initialized.")
-
 	beego.Run()
 }
 
