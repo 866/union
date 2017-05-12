@@ -1,8 +1,8 @@
 # Union HTTP Server #
 
-This is a web server written in Go for communication with clients/*Trigger* server.
-*Trigger* server is not for public use so it is on the private repository.
-If you want to collaborate please contact me <mailto:comrazvictor@example.com>
+This is a web server written in Go for communication with clients and with
+**Trigger** server. **Trigger** server is not for public use so it is on the
+private repository. If you want to collaborate please contact me <comrazvictor@example.com>
 
 ### What is this server for? ###
 
@@ -19,24 +19,18 @@ Do the following steps:
 * Clone the repo:
 
 ```
-#!bash
-
 git clone  https://github.com/866/union
 ```
 
 * Go to the source directory:
 
 ```
-#!bash
-
 cd union
 ```
 
 * Install all necessary packages:
 
 ```
-#!bash
-
 glide install
 ```
 
@@ -51,7 +45,6 @@ glide install
 * Build the project:
 
 ```
-#!bash
 go build
 ```
 
