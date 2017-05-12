@@ -1,14 +1,18 @@
 package db
 
 import (
-	"testing"
-	"strconv"
 	"math/rand"
+	"os"
+	"path"
+	"strconv"
 	"sync"
+	"testing"
 )
 
+const dbPath = "./"
+
 func TestLMDB(t *testing.T) {
-	lmdb, err := MakeLMDBHandler("/tmp")
+	lmdb, err := MakeLMDBHandler(dbPath)
 	written := []byte("123")
 	if err != nil {
 		t.Errorf("MakeLMDBHandler error: %v", err)
@@ -37,7 +41,7 @@ func (u Update) Apply(input []byte) ([]byte, error) {
 }
 
 func TestUpdate(t *testing.T) {
-	lmdb, err := MakeLMDBHandler("/tmp")
+	lmdb, err := MakeLMDBHandler(dbPath)
 	written := []byte("1")
 	expected := []byte("202323")
 	if err != nil {
@@ -68,7 +72,7 @@ func BenchmarkWrite100bytesEntries(b *testing.B) {
 	for i := range message {
 		message[i] = byte(i)
 	}
-	lmdb, err := MakeLMDBHandler("/tmp")
+	lmdb, err := MakeLMDBHandler(dbPath)
 	if err != nil {
 		b.Errorf("MakeLMDBHandler error: %v", err)
 	}
@@ -79,11 +83,11 @@ func BenchmarkWrite100bytesEntries(b *testing.B) {
 }
 
 func BenchmarkWrite10kbytesEntries(b *testing.B) {
-	message := make([]byte, 10 * 1024)
+	message := make([]byte, 10*1024)
 	for i := range message {
 		message[i] = byte(i % 256)
 	}
-	lmdb, err := MakeLMDBHandler("/tmp")
+	lmdb, err := MakeLMDBHandler(dbPath)
 	if err != nil {
 		b.Errorf("MakeLMDBHandler error: %v", err)
 	}
@@ -93,13 +97,12 @@ func BenchmarkWrite10kbytesEntries(b *testing.B) {
 	}
 }
 
-
 func BenchmarkRead10kbytesEntries(b *testing.B) {
-	message := make([]byte, 10 * 1024)
+	message := make([]byte, 10*1024)
 	for i := range message {
 		message[i] = byte(i % 256)
 	}
-	lmdb, err := MakeLMDBHandler("/tmp")
+	lmdb, err := MakeLMDBHandler(dbPath)
 	if err != nil {
 		b.Errorf("MakeLMDBHandler error: %v", err)
 	}
@@ -112,13 +115,12 @@ func BenchmarkRead10kbytesEntries(b *testing.B) {
 	}
 }
 
-
 func BenchmarkRead100bytesEntries(b *testing.B) {
 	message := make([]byte, 100)
 	for i := range message {
 		message[i] = byte(i)
 	}
-	lmdb, err := MakeLMDBHandler("/tmp")
+	lmdb, err := MakeLMDBHandler(dbPath)
 	if err != nil {
 		b.Errorf("MakeLMDBHandler error: %v", err)
 	}
@@ -132,11 +134,11 @@ func BenchmarkRead100bytesEntries(b *testing.B) {
 }
 
 func BenchmarkRead10kbytesEntriesWithParallelReaders(b *testing.B) {
-	message := make([]byte, 10 * 1024)
+	message := make([]byte, 10*1024)
 	for i := range message {
 		message[i] = byte(i % 256)
 	}
-	lmdb, err := MakeLMDBHandler("/tmp")
+	lmdb, err := MakeLMDBHandler(dbPath)
 	if err != nil {
 		b.Errorf("MakeLMDBHandler error: %v", err)
 	}
@@ -155,15 +157,22 @@ func BenchmarkRead10kbytesEntriesWithParallelReaders(b *testing.B) {
 	wg.Wait()
 }
 
-
 func compareBytes(a, b []byte, t *testing.T) {
 	if len(a) != len(b) {
 		t.Errorf("Length of the written value(%d) doesn't equal to the length of read value(%d)",
 			len(a), len(b))
 	}
-	for i := range(a) {
+	for i := range a {
 		if a[i] != b[i] {
 			t.Errorf("Written slice doesn't match with read slice at position %d", i)
 		}
 	}
+}
+
+func TestMain(m *testing.M) {
+	code := m.Run()
+	// Remove lmdb files
+	_ = os.Remove(path.Join(dbPath, "lock.mdb"))
+	_ = os.Remove(path.Join(dbPath, "data.mdb"))
+	os.Exit(code)
 }

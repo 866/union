@@ -30,10 +30,11 @@ type LMDB struct {
 func (dbh *LMDB) writer() {
 	runtime.LockOSThread()
 	defer runtime.LockOSThread()
-
+	// Endless loop which receives tasks
 	for {
 		select {
 		case work, open := <-dbh.worker:
+			// Check for closed channel
 			if !open {
 				return
 			}
