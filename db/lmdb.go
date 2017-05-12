@@ -1,3 +1,7 @@
+// lmdb.go simplifies the work with lmdb
+// 866
+// All Rights Reserved
+
 package db
 
 import (

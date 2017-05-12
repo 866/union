@@ -1,3 +1,8 @@
+// db package works with different key-value storages
+// Currently it supports the work with lmdb
+// 866
+// All Rights Reserved
+
 package db
 
 // DBHandler is an instrument for working with any key-value storage.

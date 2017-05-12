@@ -1,3 +1,6 @@
+// 866
+// All Rights Reserved
+
 package db
 
 import (

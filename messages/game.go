@@ -1,3 +1,9 @@
+// game.go describes game engine and events interface
+// 866
+// All Rights Reserved
+
+// Package messages helps with communication between server and client.
+// It also provides game engine of union HTTP server.
 package messages
 
 import (

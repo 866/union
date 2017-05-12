@@ -1,4 +1,7 @@
-// Messages package is used for converting and transmitting the information for server to client and vice versa.
+// structs.go describes structures used in communication
+// 866
+// All Rights Reserved
+
 package messages
 
 import (
