@@ -82,7 +82,7 @@
   <footer>
     <div class="author">
       <button id="wsbutton" onclick="wsSwitch()">Stop/Start updating</button>
-      JSON  <pre id="json-renderer"></pre>
+      JSON  <p id="json-renderer"></p>
       Official website:
       <a href="http://{{.Website}}">{{.Website}}</a> /
       Contact me:
