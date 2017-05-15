@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"github.com/satori/go.uuid"
 	"fmt"
+	"time"
 )
 
 // Server --> Client messages
@@ -96,6 +97,7 @@ func (p *Proposal) FillRandom() {
 type ChatMessage struct {
 	AuthorID string `json:"authorid"`
 	Text     string `json:"text"`
+	Time	 int64  `json:"time"`
 }
 
 // FillRandom fills the ChatMessage object with a random data.
@@ -105,6 +107,7 @@ func (cm *ChatMessage) FillRandom() {
 	cm.AuthorID = uuid.NewV4().String()
 	n := rand.Intn(100) + 1
 	cm.Text = randSentence(n)
+	cm.Time = time.Now().Unix()
 }
 
 // ChatBucket is a bucket of messages.
