@@ -11,13 +11,14 @@ type DBHandler interface {
 	Read(string, []byte) ([]byte, error)
 	Write(string, []byte, []byte) error
 	Modify(string, []byte, Modifier) error
+	Append(string, []byte, []byte, Modifier) error
 	Close()
 }
 
 const (
 	// CHAT names the db which stores chat messages.
 	CHAT = "chat"
-	// PRIVATE names the private db which stores passwords.
+	// PRIVATE names the private db which stores password hashes.
 	PRIVATE = "private"
 	// PROPOSALS names the database which contains info about proposals.
 	PROPOSALS = "proposals"

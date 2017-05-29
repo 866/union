@@ -93,21 +93,23 @@ func (p *Proposal) FillRandom() {
 	p.History = history
 }
 
-// ChatMessage represents chat message which can be send via websockets from server to client.
+// ChatMessage represents chat message which can be send via websockets from server to client and vice versa.
 type ChatMessage struct {
-	AuthorID string `json:"authorid"`
-	Text     string `json:"text"`
-	Time	 int64  `json:"time"`
+	AuthorID* string `json:"authorid,omitempty"`
+	Time*	  int64  `json:"time,omitempty"`
+	Text      string `json:"text"`
 }
 
 // FillRandom fills the ChatMessage object with a random data.
 // The sentence has length from 1 to 30
 // AuthorID has 16 runes length
 func (cm *ChatMessage) FillRandom() {
-	cm.AuthorID = uuid.NewV4().String()
+	id := uuid.NewV4().String()
+	cm.AuthorID = &id
 	n := rand.Intn(100) + 1
 	cm.Text = randSentence(n)
-	cm.Time = time.Now().Unix()
+	time := time.Now().Unix()
+	cm.Time = &time
 }
 
 // ChatBucket is a bucket of messages.
@@ -128,19 +130,40 @@ func (cb *ChatBucket) FillRandom(n int) {
 
 // Message is a single websocket message
 // Type value can be:
+//  - Server --> Client
 //	0 - all proposals
 //	1 - all chat messages
 //	2 - add a proposal
 //	3 - add a message
 //	4 - update a proposal
+//	5 - error message
+//  - Client --> Server
+//	0 - add score to the proposal
+//	1 - add chat message
+//	2 - add a proposal
 type Message struct {
 	Type byte `json:"type"`
 	Data interface{} `json:"data"`
 }
 
-// WSData stores multiple Messages. Can be Marshalled to json
+// Type values
+const (
+	// Messages sent by server
+	SALLPROPS byte = 0
+	SALLCHAT byte = 1
+	SADDPROP byte = 2
+	SADDCHAT byte = 3
+	SUPPROP byte = 4
+	SERR  byte = 5
+	// Messages sent by client
+	CUPPROP byte = 0
+	CADDCHAT byte = 1
+	CADDPROP byte = 2
+)
+
+// WSData stores multiple Messages. Can be marshalled to json
 type WSData struct {
-	Data []Message
+	Messages []Message
 }
 
 // FillRandom fills up the WSData object with random number of elements that lies in the range [min, max].
@@ -159,13 +182,13 @@ func (wsd *WSData) FillRandom(chatsmin, chatsmax, propsmin, propsmax int) {
 		props[i].FillRandom()
 	}
 	// Make data slice and fill it with randomly generated data
-	wsd.Data = make([]Message, 2)
+	wsd.Messages = make([]Message, 2)
 	var place int
 	if rand.Float32() < .5 {
 		place = 1
 	}
-	wsd.Data[1 - place] = Message{1, chats}
-	wsd.Data[place] = Message{0, props}
+	wsd.Messages[1 - place] = Message{1, chats}
+	wsd.Messages[place] = Message{0, props}
 }
 
 // Jsonify converts WSData to JSON object.
