@@ -180,7 +180,7 @@ func (e *TCPWSEngine) spreadChatMsg(id IDKey, cm *ChatMessage) error {
 	return nil
 }
 
-// Unsubscibe user from the connection list.
+// Unsubscribe user from the connection list.
 func (e *TCPWSEngine) unsubscribe(id IDKey) (err error) {
 	if _, contains := e.clients[id]; contains {
 		delete(e.clients, id)
@@ -190,7 +190,7 @@ func (e *TCPWSEngine) unsubscribe(id IDKey) (err error) {
 	return
 }
 
-// Subscribe the new client and add new connection to the map.
+// Subscribe a new client and add new connection to the map.
 func (e *TCPWSEngine) subscribe(s Subscriber) (err error) {
 	if _, contains := e.clients[s.ID]; !contains {
 		e.clients[s.ID] = s.Conn
