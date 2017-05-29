@@ -137,6 +137,9 @@ func (e *TCPWSEngine) handleMessage(event WSEvent) (err error) {
 			time := time.Now().Unix()
 			chatmsg.Time = &time
 			err = e.spreadChatMsg(event.ID, chatmsg)
+			if err != nil {
+				beego.Error("%s: %s", event.ID.String(), err.Error())
+			}
 		default:
 			err = fmt.Errorf("Event type %d is not known", int(msg.Type))
 		}
@@ -145,6 +148,7 @@ func (e *TCPWSEngine) handleMessage(event WSEvent) (err error) {
 }
 
 // Broadcasts chat message and writes it into the database.
+// Runs paralelly.
 func (e *TCPWSEngine) spreadChatMsg(id IDKey, cm *ChatMessage) error {
 	// Add the message into the database
 	lastKey, err := e.db.Read(db.CHAT, db.LastCB)
@@ -161,8 +165,18 @@ func (e *TCPWSEngine) spreadChatMsg(id IDKey, cm *ChatMessage) error {
 	if err != nil {
 		return err
 	}
+	// Convert to the json byte sequence
+	var data []byte
 	// Broadcast to all users
-	// TODO
+	for id, conn := range e.clients {
+		// Immediately send event to WebSocket users.
+		if conn != nil {
+			if conn.WriteMessage(websocket.TextMessage, data) != nil {
+				// User disconnected.
+				e.leave <- id
+			}
+		}
+	}
 	return nil
 }
 
