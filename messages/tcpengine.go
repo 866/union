@@ -21,6 +21,12 @@ const CHAN_BUFFER = 10
 // IDKey is a type for ID. ID should be a unique identifier for each object.
 type IDKey uuid.UUID
 
+// IDKeyFromBytes converts bytes slice to IDKey.
+func IDKeyFromBytes(bytes []byte) (IDKey, error) {
+	uid, err := uuid.FromBytes(bytes)
+	return IDKey(uid), err
+}
+
 // String method for printing.
 func (id IDKey) String() string {
 	return uuid.UUID(id).String()
@@ -121,8 +127,8 @@ func (e *TCPWSEngine) handleMessage(event WSEvent) (err error) {
 		switch msg.Type {
 		// TODO: Add all possible events
 		case CADDCHAT:
-			chatmsg := ChatMessage{}
-			err = mapstructure.Decode(msg.Data, &chatmsg)
+			chatmsg := &ChatMessage{}
+			err = mapstructure.Decode(msg.Data, chatmsg)
 			if err != nil {
 				return
 			}
@@ -139,11 +145,25 @@ func (e *TCPWSEngine) handleMessage(event WSEvent) (err error) {
 }
 
 // Broadcasts chat message and writes it into the database.
-func (e *TCPWSEngine) spreadChatMsg(id IDKey, cm ChatMessage) (err error) {
+func (e *TCPWSEngine) spreadChatMsg(id IDKey, cm *ChatMessage) error {
 	// Add the message into the database
-
+	lastKey, err := e.db.Read(db.CHAT, db.LastCB)
+	if err != nil {
+		return err
+	}
+	var lastid IDKey
+	lastid, err = IDKeyFromBytes(lastKey)
+	if err != nil {
+		return err
+	}
+	mod := &AddChatMessage{lastid, cm}
+	err = e.db.Append(db.CHAT, db.LastCB, mod)
+	if err != nil {
+		return err
+	}
 	// Broadcast to all users
-	return
+	// TODO
+	return nil
 }
 
 // Unsubscibe user from the connection list.

@@ -11,18 +11,17 @@ import (
 	"github.com/satori/go.uuid"
 )
 
-// FULLERROR appears when the bucket of values is full
-const FULLERROR = "FULL"
+
+const (
+	// FULLERROR appears when the bucket of values is full
+	FULLERROR = "FULL"
+	// MAXCHATBUCKETSIZE is a max possible size of bucket
+	MAXCHATBUCKETSIZE = 30
+)
 
 // Modifier is a functor interface that changes the content.
 // It is used by Modify function of DBHandler
 type Modifier interface {
-	Apply([]byte) ([]byte, error)
-}
-
-// Modifier is a functor interface that changes the content.
-// It is used by Modify function of DBHandler
-type Lister interface {
 	Apply([]byte) ([]byte, error)
 }
 
@@ -98,9 +97,14 @@ func (dbh *LMDB) Modify(db string, key []byte, m Modifier) error {
 
 // Append extracts content which corresponds to the key then it modifies it by means of functor m.
 // If functor returns FULLERROR it creates a new key-value cell and write the data there.
-func (dbh *LMDB) Append(db string, key, pointer []byte, m Modifier) (error) {
+func (dbh *LMDB) Append(db string, pointer []byte, m Modifier) (error) {
 	return dbh.update(func(txn *lmdb.Txn) (err error) {
 		var v []byte
+		// Read the tail key
+		key, err := dbh.Read(CHAT, pointer)
+		if err != nil {
+			return err
+		}
 		// Read
 		v, err = txn.Get(dbh.dbs[db], key)
 		if err != nil {
@@ -118,7 +122,11 @@ func (dbh *LMDB) Append(db string, key, pointer []byte, m Modifier) (error) {
 			// TODO: change to generate key
 			key = uuid.NewV4().Bytes()
 			// Create new entry
-			err = txn.Put(dbh.dbs[db], key, []byte{}, 0)
+			v, err = m.Apply(nil)
+			if err != nil {
+				return
+			}
+			err = txn.Put(dbh.dbs[db], key, v, 0)
 			if err != nil {
 				return
 			}

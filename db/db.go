@@ -11,7 +11,7 @@ type DBHandler interface {
 	Read(string, []byte) ([]byte, error)
 	Write(string, []byte, []byte) error
 	Modify(string, []byte, Modifier) error
-	Append(string, []byte, []byte, Modifier) error
+	Append(string, []byte, Modifier) error
 	Close()
 }
 

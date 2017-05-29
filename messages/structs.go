@@ -10,6 +10,8 @@ import (
 	"github.com/satori/go.uuid"
 	"fmt"
 	"time"
+	"union/db"
+	"github.com/pkg/errors"
 )
 
 // Server --> Client messages
@@ -100,9 +102,46 @@ type ChatMessage struct {
 	Text      string `json:"text"`
 }
 
+
+// AddChatMessage is a modifier that adds message to the bucket.
+type AddChatMessage struct {
+	ptr IDKey
+	msg *ChatMessage
+}
+
+// Apply adds message to the bucket.
+// If the bucket is full it returns db.FULLERROR
+func (a *AddChatMessage) Apply(data []byte) (update []byte, err error) {
+	bucket := &ChatBucket{}
+	if data == nil {
+		// No bucket. Create the new one
+		idstr := a.ptr.String()
+		bucket.Previous = &idstr
+		bucket.Data = make([]ChatMessage, 0)
+	} else {
+		// Unmarshal the bucket
+		err = json.Unmarshal(data, bucket)
+		if err != nil {
+			return
+		}
+	}
+	// Append the message
+	bucket.Data = append(bucket.Data, *a.msg)
+	// Marshal back to bytes
+	update, err = json.Marshal(bucket)
+	if err != nil {
+		return
+	}
+	// Check if the bucket is full
+	if len(bucket.Data) > db.MAXCHATBUCKETSIZE {
+		err = errors.New(db.FULLERROR)
+	}
+	return
+}
+
 // FillRandom fills the ChatMessage object with a random data.
-// The sentence has length from 1 to 30
-// AuthorID has 16 runes length
+// The sentence has length from 1 to 30.
+// AuthorID has 16 runes length.
 func (cm *ChatMessage) FillRandom() {
 	id := uuid.NewV4().String()
 	cm.AuthorID = &id
